@@ -7,22 +7,19 @@ def get_version():
 
 if __name__ == "__main__":
     setup(
-        name='eeprom-flashtool',
+        name='margin-analysis',
         version=get_version(),
-        description='PHYTEC EEPROM Flashtool',
+        description='PYTHON phyCAM MARGIN ANALYSIS',
         packages=['src'],
-        author='PHYTEC America, LLC',
-        author_email='mmckee@phytec.com',
+        author='PHYTEC Germany, Mainz',
+        author_email='b.feldmann@phytec.de',
         classifiers=[
             'Development Status :: 4 - Beta',
-            'License :: OSI Approved :: MIT License',
-            'Programming Language :: Python :: 3.6',
+            'License ::
             'Programming Language :: Python :: 3.7',
-            'Programming Language :: Python :: 3.8',
-            'Programming Language :: Python :: 3.9',
         ],
         python_requires='>=3.6',
-        install_requires=['pyyaml', 'smbus2', 'crc8'],
+        install_requires=['pyyaml', 'smbus', 'crc8'],
         entry_points={},
         include_package_data=True,
     )

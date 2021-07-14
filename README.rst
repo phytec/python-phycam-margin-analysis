@@ -1,22 +1,17 @@
-Project name: python-phycam-margin-analysis
+PYTHON phyCAM MARGIN ANALYSIS
 =======================
 
 Maintainer: Dirk Bender
-
 responsible person: Benedikt Feldmann
-
 status of the project: inactive, proprietary
-
 type of the project: standalone
-
-link to the documentation: confluece: 
+link to the documentation in confluece: 
 https://wiki.phytec.com/display/~Feldmann/phyCAM-L+Margin+Analysis
-
 Prerequisites and dependencies: Python3 capable board, SMBUS library
 
 
-description:
-MARGIN ANALYSIS
+DESCRIPTION:
+#####
 This tool is intended for checking the signal quality on a phyCAM-L coax connection.
 The tool is based on the evaluation of an eye diagram. 
 The user can determine the signal quality of the digital data transmission 
@@ -28,7 +23,6 @@ which must be implemented on the BSP.
 
 SETUP
 #####
-
 Connect the VZ-018 module to the i.MX 8M Plus board via phyCam-M interface.
 Connect the coxial cable to be tested to port 0 of the VZ-018 module.
 Attach the coxial cable end to phyCam-L module.
@@ -76,7 +70,6 @@ Clock/ Data delay
 Shifting the scanning range
 
 
-
 RESULT:
 ####
 
@@ -87,7 +80,6 @@ at least three lines of the map must have at least four completely permissible
 eye diagram areas(green = 1.0) lined up next to each other.
 
 Also there is a summary of the run in the ma_lock_result.txt file.
-
 
 
 LICENSE:
