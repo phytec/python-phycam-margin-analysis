@@ -19,7 +19,7 @@ if __name__ == "__main__":
             'Programming Language :: Python :: 3.7',
         ],
         python_requires='>=3.6',
-        install_requires=['pyyaml', 'smbus', 'crc8'],
+        install_requires=['smbus'],
         entry_points={},
         include_package_data=True,
     )

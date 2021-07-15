@@ -2,11 +2,16 @@ PYTHON phyCAM MARGIN ANALYSIS
 =======================
 
 Maintainer: Dirk Bender
+
 responsible person: Benedikt Feldmann
+
 status of the project: inactive, proprietary
+
 type of the project: standalone
+
 link to the documentation in confluece: 
 https://wiki.phytec.com/display/~Feldmann/phyCAM-L+Margin+Analysis
+
 Prerequisites and dependencies: Python3 capable board, SMBUS library
 
 
