@@ -15,7 +15,7 @@ https://wiki.phytec.com/display/~Feldmann/phyCAM-L+Margin+Analysis
 Prerequisites and dependencies: Python3 capable board, SMBUS library
 
 
-DESCRIPTION:
+DESCRIPTION
 #####
 This tool is intended for checking the signal quality on a phyCAM-L coax connection.
 The tool is based on the evaluation of an eye diagram. 
@@ -70,12 +70,12 @@ Strobe/EQ Position
 ****
 Limiting the scanning range in order not to scan the complete eye.
 
-Clock/ Data delay
+Clock/Data delay
 ****
 Shifting the scanning range
 
 
-RESULT:
+RESULT
 ####
 
 In the terminal, there is both a graphical and a percentage output of the scan.
