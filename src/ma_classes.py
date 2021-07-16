@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+#ma_classes.py
+#Version 0.9
 
 from smbus import SMBus
 import smbus

@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+#margin_analysis0.9.py
+#Version 0.9
 
 from smbus import SMBus
 import smbus
