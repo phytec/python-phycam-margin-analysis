@@ -12,7 +12,6 @@ import sys
 import ma_classes
 
 
-
 def main():
     """
     Main program function
