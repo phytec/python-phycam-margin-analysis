@@ -89,5 +89,4 @@ Also there is a summary of the run in the ma_lock_result.txt file.
 
 LICENSE:
 ####
-
 ???
