@@ -1,7 +1,7 @@
 """python_phycam_margin_analysis.py"""
 #!/usr/bin/env python3
-# margin_analysis0.9.1.py
-# Version 0.9.1
+# margin_analysis0.10.py
+# Version 0.10
 # Copyright (C) 2021 PHYTEC Germany, Mainz
 
 import time
@@ -9,11 +9,14 @@ from smbus import SMBus
 
 
 class I2C:
+    """I2C commands with SMBUS"""
     def __init__(self, dev_address):
         self.i2c = SMBus(dev_address) # i2c bus: J8.3 (GPIO2) as SDA,
                                             # J8.5 (GPIO3) as SCL
 
     def detect(self):
+        """tries to scan the I2C bus for devices"""
+        # output: table with the list of detected devices on the specified bus
         # inspired by shell command "i2cdetect -y 2"
         print('     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f')
         for addr in range(0, 127, 16):
@@ -31,7 +34,9 @@ class I2C:
             print(lin)
 
     def read(self, addr, reg, cnt):
+        """read register of the slave"""
         # returns a list of received data
+        # inspired by shell command "i2cget"
         data = self.i2c.read_i2c_block_data(addr, reg, cnt)
         print('<RD addr {}, reg/ofs {} = {}'.format(hex(addr),
                                                     hex(reg),
@@ -39,6 +44,8 @@ class I2C:
         return data
 
     def write(self, addr, reg, data):
+        """write register of the slave"""
+        # inspired by shell command "i2cset"
         # no return value
         self.i2c.write_i2c_block_data(addr, reg, data)
         print('>WR addr {}, reg/ofs {}: {}'.format(
@@ -48,6 +55,7 @@ class I2C:
 
 
 class Bcolors():
+    """color for the characters"""
     OK = '\033[32m' #GREEN
     WARNING = '\033[33m' #YELLOW
     FAIL = '\033[31m' #RED
@@ -55,11 +63,13 @@ class Bcolors():
 
 
 class MarginRequest():
+    """question for optional parameter request"""
     def __init__(self, question):
         self.question = question
         self.variable = 0
 
     def yes_no(self):
+        """input: yes or no"""
         while True:
             print()
             print(self.question)
@@ -79,6 +89,7 @@ class MarginRequest():
 
     @staticmethod
     def color_output(s_c_output, eq_value):
+        """map output"""
         if s_c_output == 1:
             if eq_value == 1:
                 print(Bcolors.OK + "▇▇" + Bcolors.RESET, end=" ")
@@ -101,16 +112,19 @@ class MarginRequest():
                 print("▒▒", end=" ") #7x lock status #7x lock status
 
     def output(self):
+        """value return"""
         return self.variable
 
 
 class MarginInput:
+    """question for optional parameter input"""
     def __init__(self, article, what, variable):
         self.article = article
         self.what = what
         self.variable = variable
 
     def float_input(self, start, end):
+        """range between and insert of float value"""
         while True:
             print("\nDo you want to set", self.article, self.what, "? (y/n)")
             ma_input = input()
@@ -141,6 +155,7 @@ class MarginInput:
         return self.variable
 
     def int_input(self):
+        """only a minimum value for the integer parameter"""
         while True:
             print("\nDo you want to set", self.article, self.what, "? (y/n)")
             ma_input = input()
@@ -172,18 +187,21 @@ class MarginInput:
         return self.variable
 
     def output(self):
+        """parameter return"""
         return self.variable
 
 
 
 
 class MarginPosition:
+    """optional map range"""
     def __init__(self, what, begin_variable, end_variable):
         self.what = what
         self.begin_variable = begin_variable
         self.end_variable = end_variable
 
     def begin_end(self, start, end):
+        """set map range integer values"""
         while True:
             print("\nDo you want to set", self.what, "? (y/n)")
             ma_input = input()
@@ -228,9 +246,11 @@ class MarginPosition:
         return self.begin_variable, self.end_variable
 
     def begin(self):
+        """return begin parameter of the map range"""
         return self.begin_variable
 
     def end(self):
+        """return end parameter of the map range"""
         return self.end_variable
 
 
@@ -298,34 +318,34 @@ def main():
     #set RX_PORT_CTL register
     i2cbus.write_byte_data(I2C_ADDRESSD, 0x0C, 0x83)
     #Port 0 and Port1 Receiver enabled, Port 0 Receiver Lock
-    #time.sleep(0.1)
+    time.sleep(0.1)
     #set FPD3_PORT_SEL register
     i2cbus.write_byte_data(I2C_ADDRESSD, 0x4c, 0x01)
     #Write Enable for RX port 0 registers -> 0x01: writes enabled
-    #time.sleep(0.1)
+    time.sleep(0.1)
     # choose analog register page
     i2cbus.write_byte_data(I2C_ADDRESSD, 0xB0, 0x04)
     #FPD-Link III RX Port 0 Reserved Registers: Test and Debug registers
-    #time.sleep(0.1)
+    time.sleep(0.1)
 
 
     # choose reg_8 @ offset 8
     i2cbus.write_byte_data(I2C_ADDRESSD, 0xB1, 0x08)
-    #time.sleep(0.1)
+    time.sleep(0.1)
     # configure AEQ_CTL register: Disable SFILTER adaption with AEQ
     i2cbus.write_byte_data(I2C_ADDRESSD, 0x42, 0x70)
     #AEQ Error Control: [6] FPD-Link III clock errors,
     #                   [5] Packet encoding errors, [4] Parity errors
-    #time.sleep(0.1)
+    time.sleep(0.1)
     # set AEQ Bypass register: bypass AEQ, STAGE1=0, STAGE2=0, Lock Mode = 1
     i2cbus.write_byte_data(I2C_ADDRESSD, 0xD4, 0x01)	#1: Disable adaptive EQ
-    #time.sleep(0.1)
+    time.sleep(0.1)
     # set Parity Error Threshold Hi Register
     i2cbus.write_byte_data(I2C_ADDRESSD, 0x05, 0x00)
-    #time.sleep(0.1)
+    time.sleep(0.1)
     # set Parity Error Threshold Lo Register
     i2cbus.write_byte_data(I2C_ADDRESSD, 0x06, 0x01)
-    #time.sleep(0.1)
+    time.sleep(0.1)
     # Enable Encoder CRC error capability
     enc_crc = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4A)
     i2cbus.write_byte_data(I2C_ADDRESSD, 0x4A, (enc_crc | 0x10))
@@ -474,22 +494,22 @@ def main():
                                        ((ddly_ctrl<<4) + cdly_ctrl))
                 # reset digital block except registers
                 i2cbus.write_byte_data(I2C_ADDRESSD, 0x01, 0x01)
-                #time.sleep(dwell_time.output())
+                time.sleep(dwell_time.output())
                 port_status1 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4D)
                 port_status2 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4E)
                 lock_sum = 0
                 for i in range(0, lock_run.output(), 1):
                     port_status1 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4D)
-                    #time.sleep(lock_time.output())
+                    time.sleep(lock_time.output())
                     port_status2 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4E)
-                    #time.sleep(lock_time.output())
+                    time.sleep(lock_time.output())
                     if (((port_status1 & 0x3C) == 0) and
                             ((port_status2 & 0x20) == 0)):
                         lock_sum += int(port_status1 & 0x01)
                     else:
                         i2cbus.read_byte_data(I2C_ADDRESSD, 0x56)
                         #clear parity error
-                    #time.sleep(lock_time.output())
+                    time.sleep(lock_time.output())
                 lock_avg = round(float(lock_sum) / lock_run.output(), 2)
                 lock_str = "%0.1f" %lock_avg
                 eq_wert = float(lock_sum/lock_run.output())
@@ -513,22 +533,22 @@ def main():
                                        ((ddly_ctrl<<4) + cdly_ctrl))
                 # reset digital block except registers
                 i2cbus.write_byte_data(I2C_ADDRESSD, 0x01, 0x01)
-                #time.sleep(dwell_time.output())
+                time.sleep(dwell_time.output())
                 port_status1 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4D)
                 port_status2 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4E)
                 lock_sum = 0
                 for i in range(0, lock_run.output(), 1):
                     port_status1 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4D)
-                    #time.sleep(lock_time.output())
+                    time.sleep(lock_time.output())
                     port_status2 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4E)
-                    #time.sleep(lock_time.output())
+                    time.sleep(lock_time.output())
                     if (((port_status1 & 0x3C) == 0) and
                             ((port_status2 & 0x20) == 0)):
                         lock_sum += int(port_status1 & 0x01)
                     else:
                         i2cbus.read_byte_data(I2C_ADDRESSD, 0x56)
                         #clear parity error
-                    #time.sleep(lock_time.output())
+                    time.sleep(lock_time.output())
                 lock_avg = round(float(lock_sum) / lock_run.output(), 2)
                 lock_str = "%0.1f" %lock_avg
                 eq_wert = float(lock_sum/lock_run.output())
@@ -576,22 +596,22 @@ def main():
                                        ((ddly_ctrl<<4) + cdly_ctrl))
                 # reset digital block except registers
                 i2cbus.write_byte_data(I2C_ADDRESSD, 0x01, 0x01)
-                #time.sleep(dwell_time.output())
+                time.sleep(dwell_time.output())
                 port_status1 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4D)
                 port_status2 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4E)
                 lock_sum = 0
                 for i in range(0, lock_run.output(), 1):
                     port_status1 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4D)
-                    #time.sleep(lock_time.output())
+                    time.sleep(lock_time.output())
                     port_status2 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4E)
-                    #time.sleep(lock_time.output())
+                    time.sleep(lock_time.output())
                     if (((port_status1 & 0x3C) == 0) and
                             ((port_status2 & 0x20) == 0)):
                         lock_sum += int(port_status1 & 0x01)
                     else:
                         i2cbus.read_byte_data(I2C_ADDRESSD, 0x56)
                         #clear parity error
-                    #time.sleep(lock_time.output())
+                    time.sleep(lock_time.output())
                 lock_avg = round(float(lock_sum) / lock_run.output(), 2)
                 lock_str = "%0.1f" %lock_avg
                 eq_wert = float(lock_sum/lock_run.output())
@@ -613,22 +633,22 @@ def main():
                                        ((ddly_ctrl<<4) + cdly_ctrl))
                 # reset digital block except registers
                 i2cbus.write_byte_data(I2C_ADDRESSD, 0x01, 0x01)
-                #time.sleep(dwell_time.output())
+                time.sleep(dwell_time.output())
                 port_status1 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4D)
                 port_status2 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4E)
                 lock_sum = 0
                 for i in range(0, lock_run.output(), 1):
                     port_status1 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4D)
-                    #time.sleep(lock_time.output())
+                    time.sleep(lock_time.output())
                     port_status2 = i2cbus.read_byte_data(I2C_ADDRESSD, 0x4E)
-                    #time.sleep(lock_time.output())
+                    time.sleep(lock_time.output())
                     if (((port_status1 & 0x3C) == 0) and
                             ((port_status2 & 0x20) == 0)):
                         lock_sum += int(port_status1 & 0x01)
                     else:
                         i2cbus.read_byte_data(I2C_ADDRESSD, 0x56)
                         #clear parity error
-                    #time.sleep(lock_time.output())
+                    time.sleep(lock_time.output())
                 lock_avg = round(float(lock_sum) / lock_run.output(), 2)
                 lock_str = "%0.1f" %lock_avg
                 eq_wert = float(lock_sum/lock_run.output())
@@ -759,15 +779,15 @@ def main():
 
     # write reg_8 default value
     i2cbus.write_byte_data(I2C_ADDRESSD, 0xB2, 0x0)
-    #time.sleep(0.1)
+    time.sleep(0.1)
 
     #do a final digital reset including registers
     i2cbus.write_byte_data(I2C_ADDRESSD, 0x01, 0x02)
-    #time.sleep(0.1)
+    time.sleep(0.1)
 
     #readback RX_PORT_STS1 to clear Lock status changed on RX Port 0
     i2cbus.read_byte_data(I2C_ADDRESSD, 0x4D)
-    #time.sleep(0.1)
+    time.sleep(0.1)
     print("\n")
 
 
@@ -804,3 +824,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
