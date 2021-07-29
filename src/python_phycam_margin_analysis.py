@@ -138,7 +138,7 @@ class MarginInput:
                             self.variable = variable / 1000
                             break
                         print("\nPlease try again!")
-                    except TypeError:
+                    except ValueError:
                         print("\nPlease try again!")
                 break
             if (str(ma_input) == "n" or str(ma_input) == "N" or
@@ -170,7 +170,7 @@ class MarginInput:
                             self.variable = variable
                             break
                         print("\nPlease try again!")
-                    except TypeError:
+                    except ValueError:
                         print("\nPlease try again!")
                 break
             if (str(ma_input) == "n" or str(ma_input) == "N" or
@@ -192,13 +192,14 @@ class MarginInput:
 
 class MarginPosition:
     """optional map range"""
-    def __init__(self, what, begin_variable, end_variable):
+    def __init__(self, what):
         self.what = what
-        self.begin_variable = begin_variable
-        self.end_variable = end_variable
+        self.begin_variable = 0
+        self.end_variable = 14
+        self.variable = 0
 
-    def begin_end(self, start, end):
-        """set map range integer values"""
+    def yes_no(self):
+        """input: yes or no"""
         while True:
             print("\nDo you want to set", self.what, "? (y/n)")
             ma_input = input()
@@ -206,29 +207,7 @@ class MarginPosition:
                     str(ma_input) == "j" or str(ma_input) == "Yes" or
                     str(ma_input) == "yes"):
                 print()
-                while True:
-                    print("Enter integer values from", start, "to", end, ":")
-                    print(self.what, "Begin:")
-                    begin_variable = input()
-                    try:
-                        begin_variable = int(begin_variable)
-                        if start <= begin_variable <= end:
-                            self.begin_variable = begin_variable
-                            print(self.what, "End:")
-                            end_variable = input()
-                            try:
-                                end_variable = int(end_variable)
-                                if (start <= end_variable <= end and
-                                        begin_variable < end_variable):
-                                    self.end_variable = end_variable
-                                    break
-                                print("\nPlease try again!")
-                            except TypeError:
-                                print("\nPlease try again!")
-                        else:
-                            print("\nPlease try again!")
-                    except TypeError:
-                        print("\nPlease try again!")
+                self.variable = 1
                 break
             if (str(ma_input) == "n" or str(ma_input) == "N" or
                     str(ma_input) == "no" or str(ma_input) == "No" or
@@ -236,10 +215,42 @@ class MarginPosition:
                 print("The", self.what, "start value", self.begin_variable,
                       "and", self.what, "end value",
                       self.end_variable, "is set by default.")
+                self.variable = 0
                 break
             print("Incorrect input, please try again!")
-        print("current", self.what, "Begin: ", self.begin_variable)
-        print("current", self.what, "End:   ", self.end_variable, "\n")
+        return self.variable
+
+    def output(self):
+        """parameter return"""
+        return self.variable
+
+    def begin_end(self, start, end):
+        """set map range integer values"""
+        while True:
+            print("Enter integer values from", start,
+                  "to", end, ":")
+            print(self.what, "Begin:")
+            begin_variable = input()
+            try:
+                begin_variable = int(begin_variable)
+                if start <= begin_variable <= end:
+                    self.begin_variable = begin_variable
+                    print(self.what, "End:")
+                    end_variable = input()
+                    try:
+                        end_variable = int(end_variable)
+                        if (start <= end_variable <= end and
+                                begin_variable <= end_variable):
+                            self.end_variable = end_variable
+                            break
+                        print()
+                        print("Please try again! The values can not be equal!")
+                    except ValueError:
+                        print("\nPlease try again!")
+                else:
+                    print("\nPlease try again!")
+            except ValueError:
+                print("\nPlease try again!")
         return self.begin_variable, self.end_variable
 
     def begin(self):
@@ -251,15 +262,15 @@ class MarginPosition:
         return self.end_variable
 
 
+# Define registers values from datasheet
+I2C_ADDRESSD = 0x3D  # Address of DS90UB954  device
+#I2C_ADDRESSS = 0x30  # Address of DS90UB953  device
+
+
 def main():
     """
     Main program function
     """
-
-    # Define registers values from datasheet
-    I2C_ADDRESSD = 0x3D  # Address of DS90UB954  device
-    #I2C_ADDRESSS = 0x30  # Address of DS90UB953  device
-
 
     #MARGIN ANALYSIS Testversuch
     print("\n###########################################################")
@@ -280,7 +291,6 @@ def main():
     table.write("EQ,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14")
 
 
-
     #which Board
     while True:
         print("Which BUS address is assigned to the phyCAM-M interface?")
@@ -296,9 +306,8 @@ def main():
                 break
             print("Incorrect input, please try again!\n")
             i2ctemp.close()
-        except TypeError:
+        except ValueError:
             print("Incorrect input, please try again!\n")
-            i2ctemp.close()
     i2ctemp.close()
     print()
 
@@ -322,34 +331,34 @@ def main():
     #set RX_PORT_CTL register
     i2c.write(I2C_ADDRESSD, 0x0C, 0x83)
     #Port 0 and Port1 Receiver enabled, Port 0 Receiver Lock
-    time.sleep(0.1)
+    #time.sleep(0.1)
     #set FPD3_PORT_SEL register
     i2c.write(I2C_ADDRESSD, 0x4c, 0x01)
     #Write Enable for RX port 0 registers -> 0x01: writes enabled
-    time.sleep(0.1)
+    #time.sleep(0.1)
     # choose analog register page
     i2c.write(I2C_ADDRESSD, 0xB0, 0x04)
     #FPD-Link III RX Port 0 Reserved Registers: Test and Debug registers
-    time.sleep(0.1)
+    #time.sleep(0.1)
 
 
     # choose reg_8 @ offset 8
     i2c.write(I2C_ADDRESSD, 0xB1, 0x08)
-    time.sleep(0.1)
+    #time.sleep(0.1)
     # configure AEQ_CTL register: Disable SFILTER adaption with AEQ
     i2c.write(I2C_ADDRESSD, 0x42, 0x70)
     #AEQ Error Control: [6] FPD-Link III clock errors,
     #                   [5] Packet encoding errors, [4] Parity errors
-    time.sleep(0.1)
+    #time.sleep(0.1)
     # set AEQ Bypass register: bypass AEQ, STAGE1=0, STAGE2=0, Lock Mode = 1
     i2c.write(I2C_ADDRESSD, 0xD4, 0x01)	#1: Disable adaptive EQ
-    time.sleep(0.1)
+    #time.sleep(0.1)
     # set Parity Error Threshold Hi Register
     i2c.write(I2C_ADDRESSD, 0x05, 0x00)
-    time.sleep(0.1)
+    #time.sleep(0.1)
     # set Parity Error Threshold Lo Register
     i2c.write(I2C_ADDRESSD, 0x06, 0x01)
-    time.sleep(0.1)
+    #time.sleep(0.1)
     # Enable Encoder CRC error capability
     i2ctemp = SMBus(which_bus)
     enc_crc = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4A)
@@ -390,13 +399,19 @@ def main():
     print("current lock time:  ", lock_time.output(), "s")
     print()
 
-    strobe_position = MarginPosition("Strobe Position", 0, 14)
-    strobe_position.begin_end(0, 14)
+    strobe_position = MarginPosition("Strobe Position")
+    strobe_position.yes_no()
+    if strobe_position.output() == 1:
+        strobe_position.begin_end(0, 14)
+    print("current Strobe Position Begin: ", strobe_position.begin())
+    print("current Strobe Position End:   ", strobe_position.end(), "\n")
 
-
-    eq_position = MarginPosition("EQ Position", 0, 14)
-    eq_position.begin_end(0, 14)
-    print()
+    eq_position = MarginPosition("EQ Position")
+    eq_position.yes_no()
+    if eq_position.output() == 1:
+        eq_position.begin_end(0, 14)
+    print("current EQ Position Begin: ", eq_position.begin())
+    print("current EQ Position End:   ", eq_position.end(), "\n")
 
     clock_base_delay = MarginRequest("Do you want a clock base delay? (y/n)")
     clock_base_delay.yes_no()
@@ -406,10 +421,10 @@ def main():
     data_base_delay.yes_no()
     print()
 
-    #print("strobe: ", strobe_position.end()+1-strobe_position.begin())
-    #print ("eq:     ", eq_position.end()+1-eq_position.begin())
-    take_seconds = ((strobe_position.end()+1-strobe_position.begin()) *
-                    (eq_position.end()+1-eq_position.begin()) *
+    #print("strobe: ", strobe_position.end() + 1 - strobe_position.begin())
+    #print ("eq:     ", eq_position.end() + 1 - eq_position.begin())
+    take_seconds = ((strobe_position.end() + 1 - strobe_position.begin()) *
+                    (eq_position.end() + 1 - eq_position.begin()) *
                     (lock_run.output() * 3 * lock_time.output() +
                      dwell_time.output()))
     print("\nREMAINING TIME: The test will take about",
@@ -418,19 +433,18 @@ def main():
     #   round(float(take_seconds) / 60, 2), "minute(s)\n\n")
 
 
-    eq_sel2 = 0
-
-
 
     if ((strobe_position.begin() < 8) and (strobe_position.end() < 8)):
         #cdly goes high to low, so begin with high
         cdly_high = 7 - strobe_position.begin()
-        cdly_low = 8 - strobe_position.end()
-        ddly_low = ddly_high = 0
+        cdly_low = 8 - strobe_position.end() - 1
+        ddly_low = 1
+        ddly_high = 0
     if ((strobe_position.begin() >= 8) and (strobe_position.end() >= 8)):
         ddly_low = strobe_position.begin() - 7
-        ddly_high = strobe_position.end() - 8
-        cdly_low = cdly_high = 0
+        ddly_high = strobe_position.end() - 8 + 1
+        cdly_high = 0
+        cdly_low = 1
     if strobe_position.begin() < 8 <= strobe_position.end():
         cdly_high = 7 - strobe_position.begin()
         cdly_low = 1
@@ -464,11 +478,17 @@ def main():
     print(" EQ\\SP  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 ")
     if eq_position.begin() != 0:
         for i in range(0, eq_position.begin()):
-            print("\n   ", i, end="  ")
-            out_string = ("\n " + str(i) + ",0.0,0.0,0.0,0.0,0.0,0.0,0.0,"+
-                          "0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,")
+            if i < 10:
+                print("\n   ", i, end="  ")
+                out_string = ("\n " + str(i) + ",0.0,0.0,0.0,0.0,0.0,0.0,0.0,"+
+                              "0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,")
+            else:
+                print("\n  ", i, end="  ")
+                out_string = ("\n" + str(i) + ",0.0,0.0,0.0,0.0,0.0,0.0,0.0,"+
+                              "0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,")
             table.write(out_string)
 
+    eq_sel2 = 0
     #eq_sel1 is needed from 0 to 7
     #8 Durchlaeufe:  0xD4 = 1, 33, 65, 97, 129, 161, 193, 225
     for eq_sel1 in range(eq1_low, eq1_high+1, 1):
@@ -498,37 +518,37 @@ def main():
             i2c.write(I2C_ADDRESSD, 0xB2, ((ddly_ctrl<<4) + cdly_ctrl))
             # reset digital block except registers
             i2c.write(I2C_ADDRESSD, 0x01, 0x01)
-            time.sleep(dwell_time.output())
+            #time.sleep(dwell_time.output())
             i2ctemp = SMBus(which_bus)
             port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
             port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
             lock_sum = 0
             for i in range(0, lock_run.output(), 1):
                 port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
-                time.sleep(lock_time.output())
+                #time.sleep(lock_time.output())
                 port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
-                time.sleep(lock_time.output())
+                #time.sleep(lock_time.output())
                 if (((port_status1 & 0x3C) == 0) and
                         ((port_status2 & 0x20) == 0)):
                     lock_sum += int(port_status1 & 0x01)
                 else:
                     i2ctemp.read_byte_data(I2C_ADDRESSD, 0x56)
                     #clear parity error
-                time.sleep(lock_time.output())
+                #time.sleep(lock_time.output())
             i2ctemp.close()
             lock_avg = round(float(lock_sum) / lock_run.output(), 2)
             lock_str = "%0.1f" %lock_avg
             eq_wert = float(lock_sum/lock_run.output())
             a_array.append(float(eq_wert))
+            #print((ddly_ctrl<<4) + cdly_ctrl, ddly_ctrl, cdly_ctrl, end=" ")
             status_color.color_output(status_color.output(), eq_wert)
             out_string = lock_str + ","
             table.write(out_string)
-
+        #print("2.cbd_out:", clock_base_delay.output(), end=" ")
         if clock_base_delay.output():
             cdly_ctrl = 8
         else:
             cdly_ctrl = 0
-
 
 
         #cdly_ctrl = 8 #(disable 6 extra delay)
@@ -538,23 +558,23 @@ def main():
             i2c.write(I2C_ADDRESSD, 0xB2, ((ddly_ctrl<<4) + cdly_ctrl))
             # reset digital block except registers
             i2c.write(I2C_ADDRESSD, 0x01, 0x01)
-            time.sleep(dwell_time.output())
+            #time.sleep(dwell_time.output())
             i2ctemp = SMBus(which_bus)
             port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
             port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
             lock_sum = 0
             for i in range(0, lock_run.output(), 1):
                 port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
-                time.sleep(lock_time.output())
+                #time.sleep(lock_time.output())
                 port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
-                time.sleep(lock_time.output())
+                #time.sleep(lock_time.output())
                 if (((port_status1 & 0x3C) == 0) and
                         ((port_status2 & 0x20) == 0)):
                     lock_sum += int(port_status1 & 0x01)
                 else:
                     i2ctemp.read_byte_data(I2C_ADDRESSD, 0x56)
                     #clear parity error
-                time.sleep(lock_time.output())
+                #time.sleep(lock_time.output())
             i2ctemp.close()
             lock_avg = round(float(lock_sum) / lock_run.output(), 2)
             lock_str = "%0.1f" %lock_avg
@@ -583,12 +603,12 @@ def main():
         else:
             ddly_ctrl = 0
         table.write("\n")
-        if (eq_sel1 + eq_sel2) < 10:
-            print("\n   ", eq_sel1 + eq_sel2, end="  ")
-            out_string = " " + str(eq_sel1 + eq_sel2) + ","
-        else:
+        if (eq_sel1 + eq_sel2) >= 10:
             print("\n  ", eq_sel1 + eq_sel2, end="  ")  #7x eq_sel2
             out_string = str(eq_sel1 + eq_sel2) + ","
+        else:
+            print("\n   ", eq_sel1 + eq_sel2, end="  ")
+            out_string = " " + str(eq_sel1 + eq_sel2) + ","
         table.write(out_string)
         if strobe_position.begin() != 0:
             for i in range(0, strobe_position.begin()):
@@ -601,23 +621,23 @@ def main():
             i2c.write(I2C_ADDRESSD, 0xB2, ((ddly_ctrl<<4) + cdly_ctrl))
             # reset digital block except registers
             i2c.write(I2C_ADDRESSD, 0x01, 0x01)
-            time.sleep(dwell_time.output())
+            #time.sleep(dwell_time.output())
             i2ctemp = SMBus(which_bus)
             port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
             port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
             lock_sum = 0
             for i in range(0, lock_run.output(), 1):
                 port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
-                time.sleep(lock_time.output())
+                #time.sleep(lock_time.output())
                 port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
-                time.sleep(lock_time.output())
+                #time.sleep(lock_time.output())
                 if (((port_status1 & 0x3C) == 0) and
                         ((port_status2 & 0x20) == 0)):
                     lock_sum += int(port_status1 & 0x01)
                 else:
                     i2ctemp.read_byte_data(I2C_ADDRESSD, 0x56)
                     #clear parity error
-                time.sleep(lock_time.output())
+                #time.sleep(lock_time.output())
             i2ctemp.close()
             lock_avg = round(float(lock_sum) / lock_run.output(), 2)
             lock_str = "%0.1f" %lock_avg
@@ -639,23 +659,23 @@ def main():
             i2c.write(I2C_ADDRESSD, 0xB2, ((ddly_ctrl<<4) + cdly_ctrl))
             # reset digital block except registers
             i2c.write(I2C_ADDRESSD, 0x01, 0x01)
-            time.sleep(dwell_time.output())
+            #time.sleep(dwell_time.output())
             i2ctemp = SMBus(which_bus)
             port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
             port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
             lock_sum = 0
             for i in range(0, lock_run.output(), 1):
                 port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
-                time.sleep(lock_time.output())
+                #time.sleep(lock_time.output())
                 port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
-                time.sleep(lock_time.output())
+                #time.sleep(lock_time.output())
                 if (((port_status1 & 0x3C) == 0) and
                         ((port_status2 & 0x20) == 0)):
                     lock_sum += int(port_status1 & 0x01)
                 else:
                     i2c.read(I2C_ADDRESSD, 0x56)
                     #clear parity error
-                time.sleep(lock_time.output())
+                #time.sleep(lock_time.output())
             i2ctemp.close()
             lock_avg = round(float(lock_sum) / lock_run.output(), 2)
             lock_str = "%0.1f" %lock_avg
@@ -787,15 +807,15 @@ def main():
 
     # write reg_8 default value
     i2c.write(I2C_ADDRESSD, 0xB2, 0x0)
-    time.sleep(0.1)
+    #time.sleep(0.1)
 
     #do a final digital reset including registers
     i2c.write(I2C_ADDRESSD, 0x01, 0x02)
-    time.sleep(0.1)
+    #time.sleep(0.1)
 
     #readback RX_PORT_STS1 to clear Lock status changed on RX Port 0
     i2c.read(I2C_ADDRESSD, 0x4D)
-    time.sleep(0.1)
+    #time.sleep(0.1)
     print("\n")
 
 
