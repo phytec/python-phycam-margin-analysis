@@ -331,34 +331,34 @@ def main():
     #set RX_PORT_CTL register
     i2c.write(I2C_ADDRESSD, 0x0C, 0x83)
     #Port 0 and Port1 Receiver enabled, Port 0 Receiver Lock
-    #time.sleep(0.1)
+    time.sleep(0.1)
     #set FPD3_PORT_SEL register
     i2c.write(I2C_ADDRESSD, 0x4c, 0x01)
     #Write Enable for RX port 0 registers -> 0x01: writes enabled
-    #time.sleep(0.1)
+    time.sleep(0.1)
     # choose analog register page
     i2c.write(I2C_ADDRESSD, 0xB0, 0x04)
     #FPD-Link III RX Port 0 Reserved Registers: Test and Debug registers
-    #time.sleep(0.1)
+    time.sleep(0.1)
 
 
     # choose reg_8 @ offset 8
     i2c.write(I2C_ADDRESSD, 0xB1, 0x08)
-    #time.sleep(0.1)
+    time.sleep(0.1)
     # configure AEQ_CTL register: Disable SFILTER adaption with AEQ
     i2c.write(I2C_ADDRESSD, 0x42, 0x70)
     #AEQ Error Control: [6] FPD-Link III clock errors,
     #                   [5] Packet encoding errors, [4] Parity errors
-    #time.sleep(0.1)
+    time.sleep(0.1)
     # set AEQ Bypass register: bypass AEQ, STAGE1=0, STAGE2=0, Lock Mode = 1
     i2c.write(I2C_ADDRESSD, 0xD4, 0x01)	#1: Disable adaptive EQ
-    #time.sleep(0.1)
+    time.sleep(0.1)
     # set Parity Error Threshold Hi Register
     i2c.write(I2C_ADDRESSD, 0x05, 0x00)
-    #time.sleep(0.1)
+    time.sleep(0.1)
     # set Parity Error Threshold Lo Register
     i2c.write(I2C_ADDRESSD, 0x06, 0x01)
-    #time.sleep(0.1)
+    time.sleep(0.1)
     # Enable Encoder CRC error capability
     i2ctemp = SMBus(which_bus)
     enc_crc = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4A)
@@ -518,23 +518,23 @@ def main():
             i2c.write(I2C_ADDRESSD, 0xB2, ((ddly_ctrl<<4) + cdly_ctrl))
             # reset digital block except registers
             i2c.write(I2C_ADDRESSD, 0x01, 0x01)
-            #time.sleep(dwell_time.output())
+            time.sleep(dwell_time.output())
             i2ctemp = SMBus(which_bus)
             port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
             port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
             lock_sum = 0
             for i in range(0, lock_run.output(), 1):
                 port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
-                #time.sleep(lock_time.output())
+                time.sleep(lock_time.output())
                 port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
-                #time.sleep(lock_time.output())
+                time.sleep(lock_time.output())
                 if (((port_status1 & 0x3C) == 0) and
                         ((port_status2 & 0x20) == 0)):
                     lock_sum += int(port_status1 & 0x01)
                 else:
                     i2ctemp.read_byte_data(I2C_ADDRESSD, 0x56)
                     #clear parity error
-                #time.sleep(lock_time.output())
+                time.sleep(lock_time.output())
             i2ctemp.close()
             lock_avg = round(float(lock_sum) / lock_run.output(), 2)
             lock_str = "%0.1f" %lock_avg
@@ -558,23 +558,23 @@ def main():
             i2c.write(I2C_ADDRESSD, 0xB2, ((ddly_ctrl<<4) + cdly_ctrl))
             # reset digital block except registers
             i2c.write(I2C_ADDRESSD, 0x01, 0x01)
-            #time.sleep(dwell_time.output())
+            time.sleep(dwell_time.output())
             i2ctemp = SMBus(which_bus)
             port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
             port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
             lock_sum = 0
             for i in range(0, lock_run.output(), 1):
                 port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
-                #time.sleep(lock_time.output())
+                time.sleep(lock_time.output())
                 port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
-                #time.sleep(lock_time.output())
+                time.sleep(lock_time.output())
                 if (((port_status1 & 0x3C) == 0) and
                         ((port_status2 & 0x20) == 0)):
                     lock_sum += int(port_status1 & 0x01)
                 else:
                     i2ctemp.read_byte_data(I2C_ADDRESSD, 0x56)
                     #clear parity error
-                #time.sleep(lock_time.output())
+                time.sleep(lock_time.output())
             i2ctemp.close()
             lock_avg = round(float(lock_sum) / lock_run.output(), 2)
             lock_str = "%0.1f" %lock_avg
@@ -621,23 +621,23 @@ def main():
             i2c.write(I2C_ADDRESSD, 0xB2, ((ddly_ctrl<<4) + cdly_ctrl))
             # reset digital block except registers
             i2c.write(I2C_ADDRESSD, 0x01, 0x01)
-            #time.sleep(dwell_time.output())
+            time.sleep(dwell_time.output())
             i2ctemp = SMBus(which_bus)
             port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
             port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
             lock_sum = 0
             for i in range(0, lock_run.output(), 1):
                 port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
-                #time.sleep(lock_time.output())
+                time.sleep(lock_time.output())
                 port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
-                #time.sleep(lock_time.output())
+                time.sleep(lock_time.output())
                 if (((port_status1 & 0x3C) == 0) and
                         ((port_status2 & 0x20) == 0)):
                     lock_sum += int(port_status1 & 0x01)
                 else:
                     i2ctemp.read_byte_data(I2C_ADDRESSD, 0x56)
                     #clear parity error
-                #time.sleep(lock_time.output())
+                time.sleep(lock_time.output())
             i2ctemp.close()
             lock_avg = round(float(lock_sum) / lock_run.output(), 2)
             lock_str = "%0.1f" %lock_avg
@@ -659,23 +659,23 @@ def main():
             i2c.write(I2C_ADDRESSD, 0xB2, ((ddly_ctrl<<4) + cdly_ctrl))
             # reset digital block except registers
             i2c.write(I2C_ADDRESSD, 0x01, 0x01)
-            #time.sleep(dwell_time.output())
+            time.sleep(dwell_time.output())
             i2ctemp = SMBus(which_bus)
             port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
             port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
             lock_sum = 0
             for i in range(0, lock_run.output(), 1):
                 port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
-                #time.sleep(lock_time.output())
+                time.sleep(lock_time.output())
                 port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
-                #time.sleep(lock_time.output())
+                time.sleep(lock_time.output())
                 if (((port_status1 & 0x3C) == 0) and
                         ((port_status2 & 0x20) == 0)):
                     lock_sum += int(port_status1 & 0x01)
                 else:
                     i2c.read(I2C_ADDRESSD, 0x56)
                     #clear parity error
-                #time.sleep(lock_time.output())
+                time.sleep(lock_time.output())
             i2ctemp.close()
             lock_avg = round(float(lock_sum) / lock_run.output(), 2)
             lock_str = "%0.1f" %lock_avg
@@ -807,15 +807,15 @@ def main():
 
     # write reg_8 default value
     i2c.write(I2C_ADDRESSD, 0xB2, 0x0)
-    #time.sleep(0.1)
+    time.sleep(0.1)
 
     #do a final digital reset including registers
     i2c.write(I2C_ADDRESSD, 0x01, 0x02)
-    #time.sleep(0.1)
+    time.sleep(0.1)
 
     #readback RX_PORT_STS1 to clear Lock status changed on RX Port 0
     i2c.read(I2C_ADDRESSD, 0x4D)
-    #time.sleep(0.1)
+    time.sleep(0.1)
     print("\n")
 
 
