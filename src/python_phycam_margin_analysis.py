@@ -1,7 +1,7 @@
 """python_phycam_margin_analysis.py"""
 #!/usr/bin/env python3
-# margin_analysis0.11.py
-# Version 0.11
+# margin_analysis0.13.py
+# Version 0.13
 # Copyright (C) 2021 PHYTEC Germany, Mainz
 
 import time
@@ -51,7 +51,7 @@ class I2C:
         i2cbus.write_byte_data(addr, reg, data)
         i2cbus.close()
 
-class Bcolors():
+class Bcolors():  # pylint: disable=too-few-public-methods
     """color for the characters"""
     OK = '\033[32m' #GREEN
     WARNING = '\033[33m' #YELLOW
@@ -307,6 +307,8 @@ def main():
             print("Incorrect input, please try again!\n")
             i2ctemp.close()
         except ValueError:
+            print("Incorrect input, please insert an integer value!\n")
+        except FileNotFoundError:
             print("Incorrect input, please try again!\n")
     i2ctemp.close()
     print()
