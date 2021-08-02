@@ -1,8 +1,17 @@
-"""python_phycam_margin_analysis.py"""
 #!/usr/bin/env python3
-# margin_analysis0.13.py
-# Version 0.13
-# Copyright (C) 2021 PHYTEC Germany, Mainz
+
+""" python_phycam_margin_analysis
+Program to calibrate phyCAM hardware.
+Version: 0.13
+Author: Benedikt Feldmann <B.Feldmann@phytec.de>
+Maintainer: Dirk Bender <D.bender@phytec.de>
+
+The code is based on the Texas Instruments Analog LaunchPAD DS90UB954
+with permission for redistribution in an MIT compatible way, 07-2021.
+
+SPDX-License-Identifier: MIT
+Copyright: (C) 2021 PHYTEC Messtechnik GmbH
+"""
 
 import time
 from smbus import SMBus
