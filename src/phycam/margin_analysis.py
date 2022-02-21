@@ -1,6 +1,6 @@
 """ phycam margin_analysis
 Program to calibrate phyCAM hardware.
-Version: 0.14
+Version: 0.15
 Author: Benedikt Feldmann <B.Feldmann@phytec.de>
 Maintainer: Dirk Bender <D.bender@phytec.de>
 
@@ -12,7 +12,7 @@ Copyright: (C) 2021 PHYTEC Messtechnik GmbH
 """
 
 import time
-from smbus import SMBus
+from smbus2 import SMBus
 
 
 class I2C:
@@ -25,7 +25,7 @@ class I2C:
         """tries to scan the I2C bus for devices"""
         # output: table with the list of detected devices on the specified bus
         # inspired by shell command "i2cdetect -y 2"
-        i2cbus = SMBus(self.i2c)
+        i2cbus = SMBus(self.i2c, force=True)
         print('     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f')
         for addr in range(0, 127, 16):
             lin = '{:02x}:'.format(addr)
@@ -46,7 +46,7 @@ class I2C:
         """read register of the slave"""
         # returns a list of received data
         # inspired by shell command "i2cget"
-        i2cbus = SMBus(self.i2c)
+        i2cbus = SMBus(self.i2c, force=True)
         i2cbus.read_byte_data(addr, reg)
         i2cbus.close()
 
@@ -54,7 +54,7 @@ class I2C:
         """write register of the slave"""
         # inspired by shell command "i2cset"
         # no return value
-        i2cbus = SMBus(self.i2c)
+        i2cbus = SMBus(self.i2c, force=True)
         i2cbus.write_byte_data(addr, reg, data)
         i2cbus.close()
 
@@ -304,7 +304,7 @@ def main():
         which_bus = input()
         try:
             which_bus = int(which_bus)
-            i2ctemp = SMBus(which_bus)  # Create a new I2C bus
+            i2ctemp = SMBus(which_bus, force=True)  # Create a new I2C bus
             #TEST: the value of Port B has to be 122
             portb = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x00)
             if which_bus >= 0 and portb == 122:
@@ -369,14 +369,14 @@ def main():
     i2c.write(I2C_ADDRESSD, 0x06, 0x01)
     time.sleep(0.1)
     # Enable Encoder CRC error capability
-    i2ctemp = SMBus(which_bus)
+    i2ctemp = SMBus(which_bus, force=True)
     enc_crc = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4A)
     i2c.write(I2C_ADDRESSD, 0x4A, (enc_crc | 0x10))
     i2ctemp.close()
     #1: Enable CRC error flag from FPD-Link III encoder
 
     # Enable Encoder CRC
-    i2ctemp = SMBus(which_bus)
+    i2ctemp = SMBus(which_bus, force=True)
     enc_crc = i2ctemp.read_byte_data(I2C_ADDRESSD, 0xBA)
     i2c.write(I2C_ADDRESSD, 0xBA, (enc_crc & 0x7F))
     i2ctemp.close()
@@ -528,7 +528,7 @@ def main():
             # reset digital block except registers
             i2c.write(I2C_ADDRESSD, 0x01, 0x01)
             time.sleep(dwell_time.output())
-            i2ctemp = SMBus(which_bus)
+            i2ctemp = SMBus(which_bus, force=True)
             port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
             port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
             lock_sum = 0
@@ -568,7 +568,7 @@ def main():
             # reset digital block except registers
             i2c.write(I2C_ADDRESSD, 0x01, 0x01)
             time.sleep(dwell_time.output())
-            i2ctemp = SMBus(which_bus)
+            i2ctemp = SMBus(which_bus, force=True)
             port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
             port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
             lock_sum = 0
@@ -631,7 +631,7 @@ def main():
             # reset digital block except registers
             i2c.write(I2C_ADDRESSD, 0x01, 0x01)
             time.sleep(dwell_time.output())
-            i2ctemp = SMBus(which_bus)
+            i2ctemp = SMBus(which_bus, force=True)
             port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
             port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
             lock_sum = 0
@@ -669,7 +669,7 @@ def main():
             # reset digital block except registers
             i2c.write(I2C_ADDRESSD, 0x01, 0x01)
             time.sleep(dwell_time.output())
-            i2ctemp = SMBus(which_bus)
+            i2ctemp = SMBus(which_bus, force=True)
             port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
             port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
             lock_sum = 0
