@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
-
-""" python_phycam_margin_analysis
+""" phycam margin_analysis
 Program to calibrate phyCAM hardware.
-Version: 0.13
+Version: 0.14
 Author: Benedikt Feldmann <B.Feldmann@phytec.de>
 Maintainer: Dirk Bender <D.bender@phytec.de>
 
