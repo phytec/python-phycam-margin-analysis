@@ -269,9 +269,26 @@ class MarginPosition:
         return self.end_variable
 
 
-# Define registers values from datasheet
-I2C_ADDRESSD = 0x3D  # Address of DS90UB954  device
-#I2C_ADDRESSS = 0x30  # Address of DS90UB953  device
+# Define registers and values from datasheet
+I2C_ADDRESS_DS90UB954 = 0x3d #this is the default ID if id-pin is pulled high
+I2C_ADDRESS_DS90UB953 = 0x30
+
+REG_I2C_DEV_ID = 0x00
+REG_RESET = 0x01
+REG_PAR_ERR_THOLD_HI = 0x05
+REG_PAR_ERR_THOLD_LO = 0x06
+REG_RX_PORT_CTL = 0x0c
+REG_AEQ_CTL1 = 0x42
+REG_FPD3_CAP = 0x4a
+REG_FPD3_PORT_SEL = 0x4c
+REG_RX_PORT_STS1 = 0x4d
+REG_RX_PORT_STS2 = 0x4e
+REG_RX_PAR_ERR_LO = 0x56
+REG_IND_ACC_CTL = 0xb0
+REG_IND_ACC_ADDR = 0xb1
+REG_IND_ACC_DATA = 0xb2
+REG_FPD3_ENC_CTL = 0xba
+REG_ADAPTIVE_EQ_BYPASS = 0xd4
 
 
 def main():
@@ -305,9 +322,10 @@ def main():
         try:
             which_bus = int(which_bus)
             i2ctemp = SMBus(which_bus, force=True)  # Create a new I2C bus
-            #TEST: the value of Port B has to be 122
-            portb = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x00)
-            if which_bus >= 0 and portb == 122:
+            dev_id = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_I2C_DEV_ID)
+            # bit 0 id dev_id indicates if id is overwritten by register,
+            # alternative id strappings or set by register not supported
+            if which_bus >= 0 and (dev_id >> 1) == I2C_ADDRESS_DS90UB954:
                 print("BUS-check: OK")
                 i2ctemp.close()
                 break
@@ -331,54 +349,54 @@ def main():
                                   "before starting the test? (y/n)")
     digital_reset.yes_no()
     if digital_reset.output() == 1:
-        i2c.write(I2C_ADDRESSD, 0x01, 0x02)
+        i2c.write(I2C_ADDRESS_DS90UB954, REG_RESET, 0x02)
     else:
         print("\rNo final digital reset!")
     print()
 
 
     #set RX_PORT_CTL register
-    i2c.write(I2C_ADDRESSD, 0x0C, 0x83)
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_RX_PORT_CTL, 0x83)
     #Port 0 and Port1 Receiver enabled, Port 0 Receiver Lock
     time.sleep(0.1)
     #set FPD3_PORT_SEL register
-    i2c.write(I2C_ADDRESSD, 0x4c, 0x01)
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_FPD3_PORT_SEL, 0x01)
     #Write Enable for RX port 0 registers -> 0x01: writes enabled
     time.sleep(0.1)
     # choose analog register page
-    i2c.write(I2C_ADDRESSD, 0xB0, 0x04)
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_IND_ACC_CTL, 0x04)
     #FPD-Link III RX Port 0 Reserved Registers: Test and Debug registers
     time.sleep(0.1)
 
 
     # choose reg_8 @ offset 8
-    i2c.write(I2C_ADDRESSD, 0xB1, 0x08)
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_IND_ACC_ADDR, 0x08)
     time.sleep(0.1)
     # configure AEQ_CTL register: Disable SFILTER adaption with AEQ
-    i2c.write(I2C_ADDRESSD, 0x42, 0x70)
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_AEQ_CTL1, 0x70)
     #AEQ Error Control: [6] FPD-Link III clock errors,
     #                   [5] Packet encoding errors, [4] Parity errors
     time.sleep(0.1)
     # set AEQ Bypass register: bypass AEQ, STAGE1=0, STAGE2=0, Lock Mode = 1
-    i2c.write(I2C_ADDRESSD, 0xD4, 0x01)	#1: Disable adaptive EQ
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_ADAPTIVE_EQ_BYPASS, 0x01)	#1: Disable adaptive EQ
     time.sleep(0.1)
     # set Parity Error Threshold Hi Register
-    i2c.write(I2C_ADDRESSD, 0x05, 0x00)
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_PAR_ERR_THOLD_HI, 0x00)
     time.sleep(0.1)
     # set Parity Error Threshold Lo Register
-    i2c.write(I2C_ADDRESSD, 0x06, 0x01)
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_PAR_ERR_THOLD_LO, 0x01)
     time.sleep(0.1)
     # Enable Encoder CRC error capability
     i2ctemp = SMBus(which_bus, force=True)
-    enc_crc = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4A)
-    i2c.write(I2C_ADDRESSD, 0x4A, (enc_crc | 0x10))
+    enc_crc = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_FPD3_CAP)
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_FPD3_CAP, (enc_crc | 0x10))
     i2ctemp.close()
     #1: Enable CRC error flag from FPD-Link III encoder
 
     # Enable Encoder CRC
     i2ctemp = SMBus(which_bus, force=True)
-    enc_crc = i2ctemp.read_byte_data(I2C_ADDRESSD, 0xBA)
-    i2c.write(I2C_ADDRESSD, 0xBA, (enc_crc & 0x7F))
+    enc_crc = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_FPD3_ENC_CTL)
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_FPD3_ENC_CTL, (enc_crc & 0x7F))
     i2ctemp.close()
 
 
@@ -502,7 +520,7 @@ def main():
     #8 Durchlaeufe:  0xD4 = 1, 33, 65, 97, 129, 161, 193, 225
     for eq_sel1 in range(eq1_low, eq1_high+1, 1):
         a_array = []
-        i2c.write(I2C_ADDRESSD, 0xD4, ((eq_sel1<<5)+(eq_sel2<<1)+0x01))
+        i2c.write(I2C_ADDRESS_DS90UB954, REG_ADAPTIVE_EQ_BYPASS, ((eq_sel1<<5)+(eq_sel2<<1)+0x01))
             #eq_sel1 Bitweise um 5 Stellen nach links verschieben
             #z.B 2=(10) --> (100 0000) = 64
 
@@ -524,24 +542,24 @@ def main():
         #ddly_ctrl = 8 #(disable 6 extra delay)
         #7 Durchlaeufe:  0xB2 = 143, 142, 141, 140, 139, 138, 137    8x7=56
         for cdly_ctrl in range(cdly_high, cdly_low-1, -1):
-            i2c.write(I2C_ADDRESSD, 0xB2, ((ddly_ctrl<<4) + cdly_ctrl))
+            i2c.write(I2C_ADDRESS_DS90UB954, REG_IND_ACC_DATA, ((ddly_ctrl<<4) + cdly_ctrl))
             # reset digital block except registers
-            i2c.write(I2C_ADDRESSD, 0x01, 0x01)
+            i2c.write(I2C_ADDRESS_DS90UB954, REG_RESET, 0x01)
             time.sleep(dwell_time.output())
             i2ctemp = SMBus(which_bus, force=True)
-            port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
-            port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
+            port_status1 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS1)
+            port_status2 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS2)
             lock_sum = 0
             for i in range(0, lock_run.output(), 1):
-                port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
+                port_status1 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS1)
                 time.sleep(lock_time.output())
-                port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
+                port_status2 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS2)
                 time.sleep(lock_time.output())
                 if (((port_status1 & 0x3C) == 0) and
                         ((port_status2 & 0x20) == 0)):
                     lock_sum += int(port_status1 & 0x01)
                 else:
-                    i2ctemp.read_byte_data(I2C_ADDRESSD, 0x56)
+                    i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PAR_ERR_LO)
                     #clear parity error
                 time.sleep(lock_time.output())
             i2ctemp.close()
@@ -564,24 +582,24 @@ def main():
         #8 Durchlaeufe:  0xB2 = 136,152,168,184,200,216,232,2488x8=64
         for ddly_ctrl in range(ddly_low, ddly_high+1, 1):
             # write reg_8
-            i2c.write(I2C_ADDRESSD, 0xB2, ((ddly_ctrl<<4) + cdly_ctrl))
+            i2c.write(I2C_ADDRESS_DS90UB954, REG_IND_ACC_DATA, ((ddly_ctrl<<4) + cdly_ctrl))
             # reset digital block except registers
-            i2c.write(I2C_ADDRESSD, 0x01, 0x01)
+            i2c.write(I2C_ADDRESS_DS90UB954, REG_RESET, 0x01)
             time.sleep(dwell_time.output())
             i2ctemp = SMBus(which_bus, force=True)
-            port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
-            port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
+            port_status1 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS1)
+            port_status2 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS2)
             lock_sum = 0
             for i in range(0, lock_run.output(), 1):
-                port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
+                port_status1 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS1)
                 time.sleep(lock_time.output())
-                port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
+                port_status2 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS2)
                 time.sleep(lock_time.output())
                 if (((port_status1 & 0x3C) == 0) and
                         ((port_status2 & 0x20) == 0)):
                     lock_sum += int(port_status1 & 0x01)
                 else:
-                    i2ctemp.read_byte_data(I2C_ADDRESSD, 0x56)
+                    i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PAR_ERR_LO)
                     #clear parity error
                 time.sleep(lock_time.output())
             i2ctemp.close()
@@ -606,7 +624,7 @@ def main():
     #7 Durchlaeufe:  0xD4 = 227, 229, 231, 233, 235, 237, 239
     for eq_sel2 in range(eq2_low, eq2_high+1, 1):
         a_array = []
-        i2c.write(I2C_ADDRESSD, 0xD4, ((eq_sel1<<5)+(eq_sel2<<1)+0x01))
+        i2c.write(I2C_ADDRESS_DS90UB954, REG_ADAPTIVE_EQ_BYPASS, ((eq_sel1<<5)+(eq_sel2<<1)+0x01))
         if data_base_delay.output():
             ddly_ctrl = 8
         else:
@@ -627,24 +645,24 @@ def main():
         #ddly_ctrl = 8 #(disable 6 extra delay)
         #7 Durchlaeufe:  0xB2 = 143, 142, 141, 140, 139, 138, 137    7x7=49
         for cdly_ctrl in range(cdly_high, cdly_low-1, -1):
-            i2c.write(I2C_ADDRESSD, 0xB2, ((ddly_ctrl<<4) + cdly_ctrl))
+            i2c.write(I2C_ADDRESS_DS90UB954, REG_IND_ACC_DATA, ((ddly_ctrl<<4) + cdly_ctrl))
             # reset digital block except registers
-            i2c.write(I2C_ADDRESSD, 0x01, 0x01)
+            i2c.write(I2C_ADDRESS_DS90UB954, REG_RESET, 0x01)
             time.sleep(dwell_time.output())
             i2ctemp = SMBus(which_bus, force=True)
-            port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
-            port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
+            port_status1 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS1)
+            port_status2 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS2)
             lock_sum = 0
             for i in range(0, lock_run.output(), 1):
-                port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
+                port_status1 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS1)
                 time.sleep(lock_time.output())
-                port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
+                port_status2 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS2)
                 time.sleep(lock_time.output())
                 if (((port_status1 & 0x3C) == 0) and
                         ((port_status2 & 0x20) == 0)):
                     lock_sum += int(port_status1 & 0x01)
                 else:
-                    i2ctemp.read_byte_data(I2C_ADDRESSD, 0x56)
+                    i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PAR_ERR_LO)
                     #clear parity error
                 time.sleep(lock_time.output())
             i2ctemp.close()
@@ -665,24 +683,24 @@ def main():
         #cdly_ctrl = 8 #(disable 6 extra delay)
         #8 Durchlaeufe:  0xB2 = 136,152,168,184,200,216,232,248      7x8=64
         for ddly_ctrl in range(ddly_low, ddly_high+1, 1):
-            i2c.write(I2C_ADDRESSD, 0xB2, ((ddly_ctrl<<4) + cdly_ctrl))
+            i2c.write(I2C_ADDRESS_DS90UB954, REG_IND_ACC_DATA, ((ddly_ctrl<<4) + cdly_ctrl))
             # reset digital block except registers
-            i2c.write(I2C_ADDRESSD, 0x01, 0x01)
+            i2c.write(I2C_ADDRESS_DS90UB954, REG_RESET, 0x01)
             time.sleep(dwell_time.output())
             i2ctemp = SMBus(which_bus, force=True)
-            port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
-            port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
+            port_status1 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS1)
+            port_status2 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS2)
             lock_sum = 0
             for i in range(0, lock_run.output(), 1):
-                port_status1 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4D)
+                port_status1 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS1)
                 time.sleep(lock_time.output())
-                port_status2 = i2ctemp.read_byte_data(I2C_ADDRESSD, 0x4E)
+                port_status2 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS2)
                 time.sleep(lock_time.output())
                 if (((port_status1 & 0x3C) == 0) and
                         ((port_status2 & 0x20) == 0)):
                     lock_sum += int(port_status1 & 0x01)
                 else:
-                    i2c.read(I2C_ADDRESSD, 0x56)
+                    i2c.read(I2C_ADDRESS_DS90UB954, REG_RX_PAR_ERR_LO)
                     #clear parity error
                 time.sleep(lock_time.output())
             i2ctemp.close()
@@ -815,15 +833,15 @@ def main():
 
 
     # write reg_8 default value
-    i2c.write(I2C_ADDRESSD, 0xB2, 0x0)
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_IND_ACC_DATA, 0x0)
     time.sleep(0.1)
 
     #do a final digital reset including registers
-    i2c.write(I2C_ADDRESSD, 0x01, 0x02)
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_RESET, 0x02)
     time.sleep(0.1)
 
     #readback RX_PORT_STS1 to clear Lock status changed on RX Port 0
-    i2c.read(I2C_ADDRESSD, 0x4D)
+    i2c.read(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS1)
     time.sleep(0.1)
     print("\n")
 
