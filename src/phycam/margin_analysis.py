@@ -292,6 +292,13 @@ REG_ADAPTIVE_EQ_BYPASS = 0xd4
 
 IND_REG_OFF_STROBE_SET = 0x08
 
+RX_PORT_CTL_RESERVED = 0x2 << 6 # bit 7:6 default to 0x2
+RX_PORT_CTL_PORT0_EN = 1 << 0
+RX_PORT_CTL_PORT1_EN = 1 << 1
+RX_PORT_CTL_LOCK_SEL_SHIFT = 2
+
+FPD3_PORT_SEL_RX_READ_PORT_SHIFT = 4
+
 def main():
     """
     Main program function
@@ -327,15 +334,28 @@ def main():
             # bit 0 id dev_id indicates if id is overwritten by register,
             # alternative id strappings or set by register not supported
             if which_bus >= 0 and (dev_id >> 1) == I2C_ADDRESS_DS90UB954:
-                print("BUS-check: OK")
+                print("\tBUS-check: OK")
                 i2ctemp.close()
-                break
-            print("Incorrect input, please try again!\n")
-            i2ctemp.close()
+                print("Which Port is the phyCAM-L interface connected to (enter for default)?")
+                which_port = input()
+                match which_port:
+                    case "":
+                        which_port = 0
+                        print("\tTesting on default port 0")
+                        break
+                    case "0" | "1":
+                        print(f"\tTesting on port {which_port}")
+                        which_port = int(which_port)
+                        break
+                    case _:
+                        print("\tIncorrect Port input, please try again!")
+            else:
+                print("\tIncorrect BUS address input, please try again!")
+                i2ctemp.close()
         except ValueError:
-            print("Incorrect input, please insert an integer value!\n")
+            print("\tIncorrect input, please insert an integer value!")
         except FileNotFoundError:
-            print("Incorrect input, please try again!\n")
+            print("\tBus does not exist, please try again!")
     i2ctemp.close()
     print()
 
@@ -355,19 +375,22 @@ def main():
         print("\rNo final digital reset!")
     print()
 
-
     #set RX_PORT_CTL register
-    i2c.write(I2C_ADDRESS_DS90UB954, REG_RX_PORT_CTL, 0x83)
-    #Port 0 and Port1 Receiver enabled, Port 0 Receiver Lock
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_RX_PORT_CTL, RX_PORT_CTL_RESERVED
+                                                    | RX_PORT_CTL_PORT0_EN
+                                                    | RX_PORT_CTL_PORT1_EN
+                                                    | which_port << RX_PORT_CTL_LOCK_SEL_SHIFT)
+    #Port 0 and Port1 Receiver enabled, Port x Receiver Lock
     time.sleep(0.1)
-    #set FPD3_PORT_SEL register
-    i2c.write(I2C_ADDRESS_DS90UB954, REG_FPD3_PORT_SEL, 0x01)
-    #Write Enable for RX port 0 registers -> 0x01: writes enabled
+    #set Read/Write Enable for RX port x registers in FPD3_PORT_SEL register
+    rx_write_port = 0x01 << which_port
+    rx_read_port = which_port << FPD3_PORT_SEL_RX_READ_PORT_SHIFT
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_FPD3_PORT_SEL, rx_write_port | rx_read_port)
     time.sleep(0.1)
 
     # prepare indirect register access
-    # choose FPD-Link III RX Port 0 Reserved Registers: Test and Debug registers
-    i2c.write(I2C_ADDRESS_DS90UB954, REG_IND_ACC_CTL, 0x04)
+    # choose FPD-Link III RX Port x Reserved Registers: Test and Debug registers
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_IND_ACC_CTL, 0x01 << (2 + which_port))
     time.sleep(0.1)
     # choose STROBE_SET (@offset 8)
     i2c.write(I2C_ADDRESS_DS90UB954, REG_IND_ACC_ADDR, IND_REG_OFF_STROBE_SET)
@@ -550,6 +573,7 @@ def main():
             time.sleep(dwell_time.output())
             i2ctemp = SMBus(which_bus, force=True)
             port_status1 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS1)
+            # print(f"Reading status from port {port_status1:08b}") # debug if we read the correct port
             port_status2 = i2ctemp.read_byte_data(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS2)
             lock_sum = 0
             for i in range(0, lock_run.output(), 1):
