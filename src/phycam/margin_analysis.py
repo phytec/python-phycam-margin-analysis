@@ -290,6 +290,7 @@ REG_IND_ACC_DATA = 0xb2
 REG_FPD3_ENC_CTL = 0xba
 REG_ADAPTIVE_EQ_BYPASS = 0xd4
 
+IND_REG_OFF_STROBE_SET = 0x08
 
 def main():
     """
@@ -363,15 +364,16 @@ def main():
     i2c.write(I2C_ADDRESS_DS90UB954, REG_FPD3_PORT_SEL, 0x01)
     #Write Enable for RX port 0 registers -> 0x01: writes enabled
     time.sleep(0.1)
-    # choose analog register page
+
+    # prepare indirect register access
+    # choose FPD-Link III RX Port 0 Reserved Registers: Test and Debug registers
     i2c.write(I2C_ADDRESS_DS90UB954, REG_IND_ACC_CTL, 0x04)
-    #FPD-Link III RX Port 0 Reserved Registers: Test and Debug registers
     time.sleep(0.1)
-
-
-    # choose reg_8 @ offset 8
-    i2c.write(I2C_ADDRESS_DS90UB954, REG_IND_ACC_ADDR, 0x08)
+    # choose STROBE_SET (@offset 8)
+    i2c.write(I2C_ADDRESS_DS90UB954, REG_IND_ACC_ADDR, IND_REG_OFF_STROBE_SET)
     time.sleep(0.1)
+    # values will be written to REG_IND_ACC_DATA later in the test loops!
+
     # configure AEQ_CTL register: Disable SFILTER adaption with AEQ
     i2c.write(I2C_ADDRESS_DS90UB954, REG_AEQ_CTL1, 0x70)
     #AEQ Error Control: [6] FPD-Link III clock errors,
