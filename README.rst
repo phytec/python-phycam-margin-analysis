@@ -6,14 +6,8 @@ Maintainer: Dirk Bender
 
 responsible person: Benedikt Feldmann
 
-status of the project: active
-
-type of the project: standalone
-
-link to the documentation in confluece: 
-https://wiki.phytec.com/display/~Feldmann/phyCAM-L+Margin+Analysis
-
-Prerequisites and dependencies: Python3 capable board, SMBUS library
+Link to the main documentation :
+https://wiki.phytec.com/pages/releaseview.action?pageId=446169306
 
 
 DESCRIPTION
@@ -23,8 +17,8 @@ The tool is based on the evaluation of an eye diagram.
 The user can determine the signal quality of the digital data transmission
 of a specific coaxial connection between phyCAM-L and VZ-018 module.
 
-The use of this tool requires a Python3 capable board and the SMBUS library, 
-which must be implemented on the BSP.
+The prerequisites and dependencies for the use of this tool are a Python3-capable
+image and the SMBUS library.
 
 
 SETUP
@@ -34,10 +28,10 @@ Connect the coxial cable to be tested to port 0 of the VZ-018 module.
 Attach the coxial cable end to phyCam-L module.
 Reset the VZ-018 module.
 
+
 USAGE
 #####
 This tool has different modes and required/optional arguments.
-
 
 BUS address
     Enter the BUS address of the connected phyCAM-M interface on the board.
