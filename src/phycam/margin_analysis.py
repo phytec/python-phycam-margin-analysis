@@ -28,7 +28,7 @@ class I2C:
         i2cbus = SMBus(self.i2c, force=True)
         print('     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f')
         for addr in range(0, 127, 16):
-            lin = '{:02x}:'.format(addr)
+            lin = f'{addr:02x}:'
             for i in range(0, 16):
                 if addr + i < 3:
                     lin += '   '
@@ -38,7 +38,7 @@ class I2C:
                     except OSError:
                         lin += ' --'
                     else:
-                        lin += ' {:02x}'.format(addr + i)
+                        lin += f' {addr + i:02x}'
             print(lin)
         i2cbus.close()
 
@@ -589,7 +589,7 @@ def main():
                 time.sleep(lock_time.output())
             i2ctemp.close()
             lock_avg = round(float(lock_sum) / lock_run.output(), 2)
-            lock_str = "%0.1f" %lock_avg
+            lock_str = f"{lock_avg:.1f}"
             eq_wert = float(lock_sum/lock_run.output())
             a_array.append(float(eq_wert))
             #print((ddly_ctrl<<4) + cdly_ctrl, ddly_ctrl, cdly_ctrl, end=" ")
@@ -629,7 +629,7 @@ def main():
                 time.sleep(lock_time.output())
             i2ctemp.close()
             lock_avg = round(float(lock_sum) / lock_run.output(), 2)
-            lock_str = "%0.1f" %lock_avg
+            lock_str = f"{lock_avg:.1f}"
             eq_wert = float(lock_sum/lock_run.output())
             a_array.append(float(eq_wert))
             status_color.color_output(status_color.output(), eq_wert)
@@ -692,7 +692,7 @@ def main():
                 time.sleep(lock_time.output())
             i2ctemp.close()
             lock_avg = round(float(lock_sum) / lock_run.output(), 2)
-            lock_str = "%0.1f" %lock_avg
+            lock_str = f"{lock_avg:.1f}"
             eq_wert = float(lock_sum/lock_run.output())
             a_array.append(float(eq_wert))
             status_color.color_output(status_color.output(), eq_wert)
@@ -730,7 +730,7 @@ def main():
                 time.sleep(lock_time.output())
             i2ctemp.close()
             lock_avg = round(float(lock_sum) / lock_run.output(), 2)
-            lock_str = "%0.1f" %lock_avg
+            lock_str = f"{lock_avg:.1f}"
             eq_wert = float(lock_sum/lock_run.output())
             a_array.append(float(eq_wert))
             status_color.color_output(status_color.output(), eq_wert)
