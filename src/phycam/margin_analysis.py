@@ -314,14 +314,13 @@ def main():
 
 
     #lock result file
-    table = open("./ma_lock_result.txt", "w+")
+    table = open("./ma_lock_result.txt", "w+", encoding="utf-8")
     table.write(f"date: {date}")
     table.write(",,,,,,,,LOCK-RESULT,,,,,,,,")
     table.write("\n")
     table.write(",,,,,,,,SP,,,,,,,,")
     table.write("\n")
     table.write("EQ,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14")
-
 
     #which Board
     while True:
