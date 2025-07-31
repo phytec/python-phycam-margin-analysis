@@ -58,7 +58,8 @@ class I2C:
         i2cbus.write_byte_data(addr, reg, data)
         i2cbus.close()
 
-class Bcolors():  # pylint: disable=too-few-public-methods
+
+class Bcolors:  # pylint: disable=too-few-public-methods
     """color for the characters"""
     OK = '\033[32m' #GREEN
     WARNING = '\033[33m' #YELLOW
@@ -66,7 +67,7 @@ class Bcolors():  # pylint: disable=too-few-public-methods
     RESET = '\033[0m' #RESET COLOR
 
 
-class MarginRequest():
+class MarginRequest:
     """question for optional parameter request"""
     def __init__(self, question):
         self.question = question
@@ -195,8 +196,6 @@ class MarginInput:
         return self.variable
 
 
-
-
 class MarginPosition:
     """optional map range"""
     def __init__(self, what):
@@ -299,6 +298,7 @@ RX_PORT_CTL_LOCK_SEL_SHIFT = 2
 
 FPD3_PORT_SEL_RX_READ_PORT_SHIFT = 4
 
+
 def main():
     """
     Main program function
@@ -311,7 +311,6 @@ def main():
     print("##################### MARGIN ANALYSIS #####################")
     print("###########################################################")
     print(f"date: {date}")
-
 
     #lock result file
     table = open("./ma_lock_result.txt", "w+", encoding="utf-8")
@@ -358,10 +357,8 @@ def main():
     i2ctemp.close()
     print()
 
-
     i2c = I2C(which_bus)
     #i2c.detect()
-
 
     #do a final digital reset including registers if selected
     digital_reset = MarginRequest("Do you want to do a final " +
@@ -423,9 +420,7 @@ def main():
     i2c.write(I2C_ADDRESS_DS90UB954, REG_FPD3_ENC_CTL, (enc_crc & 0x7F))
     i2ctemp.close()
 
-
     lock_result = [] #initialize lock_result
-
 
     status_color = MarginRequest("Do you want a colored map? (y/n)")
     status_color.yes_no()
@@ -436,7 +431,6 @@ def main():
     #standard 0.9 seconds
     dwell_time = MarginInput("the", "dwell time", 0.9)
     dwell_time.float_input(500, 60000)
-
 
     lock_run = MarginInput("number of", "lock runs", 10)
     lock_run.int_input()
@@ -483,8 +477,6 @@ def main():
     #print("\nREMAINING TIME: The test will take about",
     #   round(float(take_seconds) / 60, 2), "minute(s)\n\n")
 
-
-
     if ((strobe_position.begin() < 8) and (strobe_position.end() < 8)):
         #cdly goes high to low, so begin with high
         cdly_high = 7 - strobe_position.begin()
@@ -522,8 +514,6 @@ def main():
         eq1_high = 7
         eq2_low = 1
         eq2_high = eq_position.end() - 7
-
-
 
     print("\n################## MARGIN ANALYSIS STATUS #################")
     print(" EQ\\SP  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 ")
@@ -601,7 +591,6 @@ def main():
             cdly_ctrl = 8
         else:
             cdly_ctrl = 0
-
 
         #cdly_ctrl = 8 #(disable 6 extra delay)
         #8 Durchlaeufe:  0xB2 = 136,152,168,184,200,216,232,2488x8=64
@@ -704,7 +693,6 @@ def main():
         else:
             cdly_ctrl = 0
 
-
         #cdly_ctrl = 8 #(disable 6 extra delay)
         #8 Durchlaeufe:  0xB2 = 136,152,168,184,200,216,232,248      7x8=64
         for ddly_ctrl in range(ddly_low, ddly_high+1, 1):
@@ -755,7 +743,6 @@ def main():
             table.write(out_string)
 
     print("\n\nLock result:")
-
 
     # For printing the lock_result
     c_eq = 0
@@ -854,9 +841,6 @@ def main():
     table.write(out_string)
     print("###########################################################")
 
-
-
-
     # write reg_8 default value
     i2c.write(I2C_ADDRESS_DS90UB954, REG_IND_ACC_DATA, 0x0)
     time.sleep(0.1)
@@ -869,7 +853,6 @@ def main():
     i2c.read(I2C_ADDRESS_DS90UB954, REG_RX_PORT_STS1)
     time.sleep(0.1)
     print("\n")
-
 
     table.write("\nParameter\n")
     if digital_reset.output() == 1:
