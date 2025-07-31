@@ -2,10 +2,6 @@
 PYTHON phyCAM MARGIN ANALYSIS
 =============================
 
-Maintainer: Dirk Bender
-
-responsible person: Benedikt Feldmann
-
 Link to the main documentation :
 https://wiki.phytec.com/pages/releaseview.action?pageId=446169306
 
