@@ -304,18 +304,18 @@ def main():
     Main program function
     """
 
+    date = time.strftime("%d.%m.%Y\ntime: %H:%M:%S\n", time.localtime())
+
     #MARGIN ANALYSIS Testversuch
     print("\n###########################################################")
     print("##################### MARGIN ANALYSIS #####################")
     print("###########################################################")
-    print("date:", time.strftime("%d.%m.%Y\ntime: %H:%M:%S\n",
-                                 time.localtime()))
+    print(f"date: {date}")
 
 
     #lock result file
     table = open("./ma_lock_result.txt", "w+")
-    table.write("date:," + time.strftime("%d.%m.%Y,\ntime:,%H:%M:%S,\n",
-                                         time.localtime()))
+    table.write(f"date: {date}")
     table.write(",,,,,,,,LOCK-RESULT,,,,,,,,")
     table.write("\n")
     table.write(",,,,,,,,SP,,,,,,,,")
