@@ -1,6 +1,6 @@
 """ phycam margin_analysis
 Program to calibrate phyCAM hardware.
-Version: 0.15
+Version: 0.16
 Author: Benedikt Feldmann <B.Feldmann@phytec.de>
 Maintainer: Dirk Bender <D.bender@phytec.de>
 
