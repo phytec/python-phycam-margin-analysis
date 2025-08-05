@@ -1,6 +1,6 @@
-=============================
-PYTHON phyCAM MARGIN ANALYSIS
-=============================
+======================
+phyCAM MARGIN ANALYSIS
+======================
 
 Link to the main documentation :
 https://wiki.phytec.com/pages/releaseview.action?pageId=446169306
@@ -14,14 +14,14 @@ The user can determine the signal quality of the digital data transmission
 of a specific coaxial connection between phyCAM-L and VZ-018 module.
 
 The prerequisites and dependencies for the use of this tool are a Python3-capable
-image and the SMBUS library.
+Linux image and the SMBUS library.
 
 
 SETUP
 #####
-Connect the VZ-018 module to the i.MX 8M Plus board via phyCam-M interface.
-Connect the coxial cable to be tested to port 0 of the VZ-018 module.
-Attach the coxial cable end to phyCam-L module.
+Connect the VZ-018 module to the PHYTEC board via phyCam-M interface.
+Connect the coaxial cable to be tested to a port of the VZ-018 module.
+Attach the coaxial cable end to phyCam-L module.
 Reset the VZ-018 module.
 
 
@@ -35,11 +35,11 @@ BUS address
 From here on you can now choose between different optionally required values and arguments:
 
 Port number
-    FPD-Link III port the phyCam-L module is connected to.
+    FPD-Link III port the phyCam-L module is connected to. Defaults to port 0 (just press enter).
 
 Digital Reset
-    Before starting the Margin Analysis test you can make a final digital reset
-    including the registers.
+    Before starting the Margin Analysis test, you can make a final digital reset
+    including the registers. Useful if the camera was in use before, i.e. enabled via overlay.
 
 Colored Map
     Choose a colored or black and white graph output.
@@ -66,11 +66,11 @@ RESULT
 
 In the terminal, there is both a graphical and a percentage output of the scan.
 A decision is made whether the cable has passed the quality test:
-For this, a 4 x 2 rectangle of the map must be completely permissible(green = 1.0) and
+For this, a 4 x 2 rectangle of the map must be completely permissible (green = 1.0) and
 at least three lines of the map must have at least four completely permissible
-eye diagram areas(green = 1.0) lined up next to each other.
+eye diagram areas (green = 1.0) lined up next to each other.
 
-Also there is a summary of the run in the ma_lock_result.txt file.
+Additionally, there is a summary of the run in the ma_lock_result.txt file.
 
 
 LICENSE:
