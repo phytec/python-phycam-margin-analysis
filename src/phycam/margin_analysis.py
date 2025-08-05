@@ -70,7 +70,7 @@ class Bcolors:  # pylint: disable=too-few-public-methods
 class MarginRequest:
     """question for optional parameter request"""
     def __init__(self, question):
-        self.question = question
+        self.question = question + " (y/N)"
         self.variable = 0
 
     def yes_no(self):
@@ -86,7 +86,7 @@ class MarginRequest:
                 break
             if (str(ma_input) == "n" or str(ma_input) == "N" or
                     str(ma_input) == "no" or str(ma_input) == "No" or
-                    str(ma_input) == "NO"):
+                    str(ma_input) == "NO" or str(ma_input) == ""):
                 self.variable = 0
                 break
             print("Incorrect input, please try again!")
@@ -131,7 +131,7 @@ class MarginInput:
     def float_input(self, start, end):
         """range between and insert of float value"""
         while True:
-            print("\nDo you want to set", self.article, self.what, "? (y/n)")
+            print("\nDo you want to set", self.article, self.what, "? (y/N)")
             ma_input = input()
             if (str(ma_input) == "y" or str(ma_input) == "Y" or
                     str(ma_input) == "j" or str(ma_input) == "Yes" or
@@ -151,7 +151,7 @@ class MarginInput:
                 break
             if (str(ma_input) == "n" or str(ma_input) == "N" or
                     str(ma_input) == "no" or str(ma_input) == "No" or
-                    str(ma_input) == "NO"):
+                    str(ma_input) == "NO" or str(ma_input) == ""):
                 print("The", self.what, "value",
                       self.variable, "is set by default")
                 break
@@ -162,7 +162,7 @@ class MarginInput:
     def int_input(self):
         """only a minimum value for the integer parameter"""
         while True:
-            print("\nDo you want to set", self.article, self.what, "? (y/n)")
+            print("\nDo you want to set", self.article, self.what, "? (y/N)")
             ma_input = input()
             if (str(ma_input) == "y" or str(ma_input) == "Y" or
                     str(ma_input) == "j" or str(ma_input) == "Yes" or
@@ -183,7 +183,7 @@ class MarginInput:
                 break
             if (str(ma_input) == "n" or str(ma_input) == "N" or
                     str(ma_input) == "no" or str(ma_input) == "No" or
-                    str(ma_input) == "NO"):
+                    str(ma_input) == "NO" or str(ma_input) == ""):
                 print("The", self.what, "value",
                       self.variable, "is set by default")
                 break
@@ -207,7 +207,7 @@ class MarginPosition:
     def yes_no(self):
         """input: yes or no"""
         while True:
-            print("\nDo you want to set", self.what, "? (y/n)")
+            print("\nDo you want to set", self.what, "? (y/N)")
             ma_input = input()
             if (str(ma_input) == "y" or str(ma_input) == "Y" or
                     str(ma_input) == "j" or str(ma_input) == "Yes" or
@@ -217,7 +217,7 @@ class MarginPosition:
                 break
             if (str(ma_input) == "n" or str(ma_input) == "N" or
                     str(ma_input) == "no" or str(ma_input) == "No" or
-                    str(ma_input) == "NO"):
+                    str(ma_input) == "NO" or str(ma_input) == ""):
                 print("The", self.what, "start value", self.begin_variable,
                       "and", self.what, "end value",
                       self.end_variable, "is set by default.")
@@ -363,7 +363,7 @@ def main():
     #do a final digital reset including registers if selected
     digital_reset = MarginRequest("Do you want to do a final " +
                                   "digital reset including registers " +
-                                  "before starting the test? (y/n)")
+                                  "before starting the test?")
     digital_reset.yes_no()
     if digital_reset.output() == 1:
         i2c.write(I2C_ADDRESS_DS90UB954, REG_RESET, 0x02)
@@ -422,7 +422,7 @@ def main():
 
     lock_result = [] #initialize lock_result
 
-    status_color = MarginRequest("Do you want a colored map? (y/n)")
+    status_color = MarginRequest("Do you want a colored map?")
     status_color.yes_no()
     print()
 
@@ -458,11 +458,11 @@ def main():
     print("current EQ Position Begin: ", eq_position.begin())
     print("current EQ Position End:   ", eq_position.end(), "\n")
 
-    clock_base_delay = MarginRequest("Do you want a clock base delay? (y/n)")
+    clock_base_delay = MarginRequest("Do you want a clock base delay?")
     clock_base_delay.yes_no()
     print()
 
-    data_base_delay = MarginRequest("Do you want a data base delay? (y/n)")
+    data_base_delay = MarginRequest("Do you want a data base delay?")
     data_base_delay.yes_no()
     print()
 
