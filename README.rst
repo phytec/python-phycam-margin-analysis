@@ -3,7 +3,7 @@ phyCAM MARGIN ANALYSIS
 ======================
 
 Link to the main documentation :
-https://wiki.phytec.com/pages/releaseview.action?pageId=446169306
+https://wiki.phytec.com/pages/releaseview.action?pageId=1058080260
 
 
 DESCRIPTION
